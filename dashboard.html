@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>DOM Systems - Easy Office</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=3.1.1">
+    <link rel="stylesheet" href="css/crm-styles.css?v=3.1.1">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Verificação de Autenticação -->
+    <script>
+        // Verifica se há sessão ativa ANTES de carregar a página
+        (function() {
+            const session = localStorage.getItem('mfs_session');
+            if (!session) {
+                // Redireciona para login se não houver sessão
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="images/logo.png?v=3.1.2" alt="DOM Systems" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display:none; width:60px; height:60px; background:#4A90E2; border-radius:8px; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:24px; flex-shrink:0;">DS</div>
+            <div class="logo-text">
+                <h1>DOM Systems</h1>
+                <span>Easy Office</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="clientes">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="#" class="nav-item" data-section="ordens">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Ordens de Serviço</span>
+            </a>
+            <a href="#" class="nav-item" data-section="servicos">
+                <i class="fas fa-tools"></i>
+                <span>Tipos de Serviço</span>
+            </a>
+            <a href="#" class="nav-item" data-section="crm">
+                <i class="fas fa-address-book"></i>
+                <span>CRM</span>
+            </a>
+            <a href="#" class="nav-item" data-section="importar">
+                <i class="fas fa-file-import"></i>
+                <span>Importar/Exportar</span>
+            </a>
+            <a href="#" class="nav-item admin-only" data-section="administracao">
+                <i class="fas fa-user-shield"></i>
+                <span>Administração</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="btnLogout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </button>
+            <p><i class="fas fa-info-circle"></i> Sistema v2.1</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="btn-menu" id="btnMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 id="pageTitle">Dashboard</h2>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar..." id="globalSearch">
+                </div>
+                <div class="user-info" id="userInfo">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Carregando...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalClientes">0</h3>
+                        <p>Total de Clientes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalOrdens">0</h3>
+                        <p>Total de OS</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="ordensConcluidas">0</h3>
+                        <p>OS Concluídas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="ordensAndamento">0</h3>
+                        <p>Em Andamento</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clipboard-list"></i> Ordens Recentes</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="ordensRecentes"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Distribuição por Status</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartStatus" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clientes Section -->
+        <section id="clientes" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fas fa-users"></i> Gestão de Clientes</h2>
+                    <p>Gerencie os clientes cadastrados</p>
+                </div>
+                <button class="btn btn-primary" id="btnNovoCliente">
+                    <i class="fas fa-user-plus"></i>
+                    Novo Cliente
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Clientes Cadastrados</h3>
+                    <div class="search-filter">
+                        <div class="search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar cliente..." id="searchClientes">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Rua</th>
+                                    <th>Cidade</th>
+                                    <th>UF</th>
+                                    <th>ZIP Code</th>
+                                    <th>Telefone 1</th>
+                                    <th>Telefone 2</th>
+                                    <th>Email</th>
+                                    <th>Empresa</th>
+                                    <th>Instruções</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyClientes">
+                                <tr>
+                                    <td colspan="12" class="empty-state">Carregando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ordens de Serviço Section -->
+        <section id="ordens" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fas fa-clipboard-list"></i> Ordens de Serviço</h2>
+                    <p>Gerencie as ordens de serviço</p>
+                </div>
+                <button class="btn btn-primary" id="btnNovaOrdem">
+                    <i class="fas fa-plus"></i>
+                    Nova OS
+                </button>
+            </div>
+
+            <!-- Filtros Avançados -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-filter"></i> Filtros Avançados</h3>
+                </div>
+                <div class="card-body">
+                    <div class="filter-grid">
+                        <div class="form-group">
+                            <label>Nº da OS</label>
+                            <input type="text" id="filterNumeroOS" placeholder="OS-001">
+                        </div>
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <input type="text" id="filterCliente" placeholder="Nome do cliente">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Serviço</label>
+                            <select id="filterTipoServico">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Responsável</label>
+                            <input type="text" id="filterResponsavel" placeholder="Nome do técnico">
+                        </div>
+                        <div class="form-group">
+                            <label>Data De</label>
+                            <input type="date" id="filterDataDe">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Até</label>
+                            <input type="date" id="filterDataAte">
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="filterStatusOS">
+                                <option value="">Todos</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Em Andamento">Em Andamento</option>
+                                <option value="Concluída">Concluída</option>
+                                <option value="Cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button class="btn btn-secondary" id="btnLimparFiltros">
+                                <i class="fas fa-times"></i>
+                                Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela de Ordens -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Ordens Cadastradas</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nº OS</th>
+                                    <th>Data</th>
+                                    <th>Código</th>
+                                    <th>Cliente</th>
+                                    <th>Tipo de Serviço</th>
+                                    <th>Responsável</th>
+                                    <th>Valor (US$)</th>
+                                    <th>Status</th>
+                                    <th>Observação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyOrdens">
+                                <tr>
+                                    <td colspan="10" class="empty-state">Carregando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tipos de Serviço Section -->
+        <section id="servicos" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fas fa-tools"></i> Tipos de Serviço</h2>
+                    <p>Gerencie os tipos de serviço disponíveis</p>
+                </div>
+                <button class="btn btn-primary" id="btnNovoServico">
+                    <i class="fas fa-plus"></i>
+                    Novo Serviço
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Serviços Cadastrados</h3>
+                    <div class="search-filter">
+                        <div class="search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar serviço..." id="searchServicos">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Descrição</th>
+                                    <th>Valor Padrão (US$)</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyServicos">
+                                <tr>
+                                    <td colspan="6" class="empty-state">Carregando...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CRM Section -->
+        <section id="crm" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fas fa-address-book"></i> CRM - Gestão de Leads</h2>
+                    <p>Gerenciar leads e oportunidades de vendas</p>
+                </div>
+                <button class="btn btn-primary" id="btnNovoLead">
+                    <i class="fas fa-plus"></i> Novo Lead
+                </button>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total de Leads</h3>
+                        <p class="stat-value" id="statTotalLeads">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Leads Quentes</h3>
+                        <p class="stat-value" id="statLeadsQuentes">0</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Valor Pipeline</h3>
+                        <p class="stat-value" id="statValorPipeline">$0.00</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Oportunidades Abertas</h3>
+                        <p class="stat-value" id="statOportunidadesAbertas">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-section" style="margin-top: 20px;">
+                <div class="search-input" style="flex: 1;">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchLeads" placeholder="Buscar por nome, empresa, email, telefone ou ID...">
+                </div>
+                
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filterEstagio" class="form-control" style="min-width: 180px;">
+                        <option value="todos">Todos os Estágios</option>
+                        <option value="Prospecção">Prospecção</option>
+                        <option value="Qualificação">Qualificação</option>
+                        <option value="Proposta">Proposta</option>
+                        <option value="Negociação">Negociação</option>
+                        <option value="Fechamento">Fechamento</option>
+                        <option value="Ganho">Ganho</option>
+                        <option value="Perdido">Perdido</option>
+                    </select>
+                    
+                    <select id="filterClassificacao" class="form-control" style="min-width: 180px;">
+                        <option value="todos">Todas as Classificações</option>
+                        <option value="Prospect">Prospect</option>
+                        <option value="Lead Quente">Lead Quente</option>
+                        <option value="Cliente Ativo">Cliente Ativo</option>
+                        <option value="Cliente Inativo">Cliente Inativo</option>
+                        <option value="Cliente Premium">Cliente Premium</option>
+                        <option value="Perdido">Perdido</option>
+                    </select>
+                    
+                    <select id="filterFonte" class="form-control" style="min-width: 150px;">
+                        <option value="todos">Todas as Fontes</option>
+                        <option value="Indicação">Indicação</option>
+                        <option value="Publicidade">Publicidade</option>
+                        <option value="Website">Website</option>
+                        <option value="Redes Sociais">Redes Sociais</option>
+                        <option value="Evento">Evento</option>
+                        <option value="Cold Call">Cold Call</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                    
+                    <button class="btn btn-secondary" onclick="window.CRM.exportarLeadsCSV()">
+                        <i class="fas fa-file-csv"></i> Exportar CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabela de Leads -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Leads Cadastrados</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome / Empresa</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Proposta / Valor</th>
+                                    <th>Estágio</th>
+                                    <th>Classificação</th>
+                                    <th>Fonte</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 40px;">
+                                        <i class="fas fa-address-book" style="font-size: 48px; color: #ccc; margin-bottom: 16px;"></i>
+                                        <p style="color: #666;">Nenhum lead cadastrado. Clique em "Novo Lead" para começar.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Importar/Exportar Section -->
+        <section id="importar" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fas fa-file-import"></i> Importar / Exportar Dados</h2>
+                    <p>Faça backup e restaure seus dados</p>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-download"></i> Exportar Dados</h3>
+                    </div>
+                    <div class="card-body">
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                            Baixe seus dados em formato JSON para fazer backup.
+                        </p>
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="btnExportarClientes">
+                                <i class="fas fa-users"></i>
+                                Exportar Clientes
+                            </button>
+                            <button class="btn btn-primary" id="btnExportarOrdens">
+                                <i class="fas fa-clipboard-list"></i>
+                                Exportar Ordens
+                            </button>
+                            <button class="btn btn-primary" id="btnExportarServicos">
+                                <i class="fas fa-tools"></i>
+                                Exportar Serviços
+                            </button>
+                            <button class="btn btn-success" id="btnExportarTudo">
+                                <i class="fas fa-database"></i>
+                                Backup Completo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-upload"></i> Importar Dados</h3>
+                    </div>
+                    <div class="card-body">
+                        <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+                            Restaure dados exportados anteriormente.
+                        </p>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Arraste e solte o arquivo JSON aqui</p>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">ou</p>
+                            <button class="btn btn-secondary" id="btnSelecionarArquivo">
+                                <i class="fas fa-folder-open"></i>
+                                Selecionar Arquivo
+                            </button>
+                            <input type="file" id="fileInput" accept=".json" style="display: none;">
+                        </div>
+                        <div id="importStatus" class="import-status"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Administração Section -->
+        <section id="administracao" class="content-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fas fa-user-shield"></i> Administração de Usuários</h2>
+                    <p>Gerencie os usuários do sistema</p>
+                </div>
+                <button class="btn btn-primary" id="btnNovoUsuario" onclick="(function(){console.log('🖱️ Botão clicado');var m=document.getElementById('modalUsuario');if(m){m.classList.add('active');console.log('✅ Modal aberto');}else{console.error('❌ Modal não encontrado');alert('Erro: Modal não encontrado');}})();">
+                    <i class="fas fa-user-plus"></i>
+                    Novo Usuário
+                </button>
+            </div>
+
+            <!-- Estatísticas de Usuários -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalUsuarios">0</h3>
+                        <p>Total de Usuários</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="usuariosAtivos">0</h3>
+                        <p>Usuários Ativos</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="usuariosAdmin">0</h3>
+                        <p>Administradores</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Usuários -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Usuários Cadastrados</h3>
+                    <div class="search-filter">
+                        <div class="search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar usuário..." id="searchUsuarios">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Tipo</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usuariosTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Carregando usuários...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Cliente -->
+    <div id="modalCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> <span id="modalClienteTitle">Novo Cliente</span></h3>
+                <button class="btn-close" onclick="closeModal('modalCliente')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formCliente">
+                    <input type="hidden" id="clienteId">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="idCliente">ID do Cliente *</label>
+                            <input type="text" id="idCliente" required readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nomeCliente">Nome Completo *</label>
+                            <input type="text" id="nomeCliente" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="enderecoRua">Endereço - Rua</label>
+                        <input type="text" id="enderecoRua">
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="enderecoCidade">Cidade</label>
+                            <input type="text" id="enderecoCidade">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="enderecoUF">UF</label>
+                            <input type="text" id="enderecoUF" maxlength="2" style="text-transform: uppercase;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="enderecoZipcode">ZIP Code</label>
+                            <input type="text" id="enderecoZipcode">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="telefone1">Telefone 1 *</label>
+                            <input type="tel" id="telefone1" required placeholder="(555) 123-4567" pattern="[\d\s\(\)\-\+]*" maxlength="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefone2">Telefone 2</label>
+                            <input type="tel" id="telefone2" placeholder="(555) 123-4567" pattern="[\d\s\(\)\-\+]*" maxlength="20">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="emailCliente">Email</label>
+                            <input type="email" id="emailCliente">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="empresa">Empresa</label>
+                            <input type="text" id="empresa">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="instrucoes">Instruções</label>
+                        <textarea id="instrucoes" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('modalCliente')">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnSalvarCliente">
+                            <i class="fas fa-save"></i>
+                            Salvar Cliente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Lead (CRM) -->
+    <div id="modalLead" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-tie"></i> <span id="modalLeadTitle">Novo Lead</span></h3>
+                <button class="btn-close" onclick="window.fecharModalLead()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formLead">
+                    <input type="hidden" id="leadId">
+                    
+                    <!-- DADOS PESSOAIS -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-user"></i> Dados Pessoais</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadIdAuto">ID *</label>
+                                <input type="text" id="leadIdAuto" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="leadNome">Nome Completo *</label>
+                                <input type="text" id="leadNome" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadEmpresa">Empresa</label>
+                                <input type="text" id="leadEmpresa">
+                            </div>
+                            <div class="form-group">
+                                <label for="leadCargo">Cargo</label>
+                                <input type="text" id="leadCargo">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTATO -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-phone"></i> Contato</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadEmail">Email *</label>
+                                <input type="email" id="leadEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="leadEmailAlternativo">Email Alternativo</label>
+                                <input type="email" id="leadEmailAlternativo">
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadCelular">Celular</label>
+                                <input type="tel" id="leadCelular" placeholder="(555) 123-4567" maxlength="14" pattern="\(\d{3}\) \d{3}-\d{4}">
+                            </div>
+                            <div class="form-group">
+                                <label for="leadTelefoneComercial">Telefone Comercial</label>
+                                <input type="tel" id="leadTelefoneComercial" placeholder="(555) 123-4567" maxlength="14" pattern="\(\d{3}\) \d{3}-\d{4}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="leadPreferenciaComunicacao">Preferência de Comunicação</label>
+                            <select id="leadPreferenciaComunicacao">
+                                <option value="Email">Email</option>
+                                <option value="Telefone">Telefone</option>
+                                <option value="WhatsApp">WhatsApp</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ENDEREÇO -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-map-marker-alt"></i> Endereço</h4>
+                        <div class="form-group">
+                            <label for="leadEnderecoRua">Rua</label>
+                            <input type="text" id="leadEnderecoRua">
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadCidade">Cidade</label>
+                                <input type="text" id="leadCidade">
+                            </div>
+                            <div class="form-group">
+                                <label for="leadEstado">Estado</label>
+                                <select id="leadEstado">
+                                    <option value="">Selecione...</option>
+                                    <option value="AL">Alabama (AL)</option>
+                                    <option value="AK">Alaska (AK)</option>
+                                    <option value="AZ">Arizona (AZ)</option>
+                                    <option value="AR">Arkansas (AR)</option>
+                                    <option value="CA">California (CA)</option>
+                                    <option value="CO">Colorado (CO)</option>
+                                    <option value="CT">Connecticut (CT)</option>
+                                    <option value="DE">Delaware (DE)</option>
+                                    <option value="FL">Florida (FL)</option>
+                                    <option value="GA">Georgia (GA)</option>
+                                    <option value="HI">Hawaii (HI)</option>
+                                    <option value="ID">Idaho (ID)</option>
+                                    <option value="IL">Illinois (IL)</option>
+                                    <option value="IN">Indiana (IN)</option>
+                                    <option value="IA">Iowa (IA)</option>
+                                    <option value="KS">Kansas (KS)</option>
+                                    <option value="KY">Kentucky (KY)</option>
+                                    <option value="LA">Louisiana (LA)</option>
+                                    <option value="ME">Maine (ME)</option>
+                                    <option value="MD">Maryland (MD)</option>
+                                    <option value="MA">Massachusetts (MA)</option>
+                                    <option value="MI">Michigan (MI)</option>
+                                    <option value="MN">Minnesota (MN)</option>
+                                    <option value="MS">Mississippi (MS)</option>
+                                    <option value="MO">Missouri (MO)</option>
+                                    <option value="MT">Montana (MT)</option>
+                                    <option value="NE">Nebraska (NE)</option>
+                                    <option value="NV">Nevada (NV)</option>
+                                    <option value="NH">New Hampshire (NH)</option>
+                                    <option value="NJ">New Jersey (NJ)</option>
+                                    <option value="NM">New Mexico (NM)</option>
+                                    <option value="NY">New York (NY)</option>
+                                    <option value="NC">North Carolina (NC)</option>
+                                    <option value="ND">North Dakota (ND)</option>
+                                    <option value="OH">Ohio (OH)</option>
+                                    <option value="OK">Oklahoma (OK)</option>
+                                    <option value="OR">Oregon (OR)</option>
+                                    <option value="PA">Pennsylvania (PA)</option>
+                                    <option value="RI">Rhode Island (RI)</option>
+                                    <option value="SC">South Carolina (SC)</option>
+                                    <option value="SD">South Dakota (SD)</option>
+                                    <option value="TN">Tennessee (TN)</option>
+                                    <option value="TX">Texas (TX)</option>
+                                    <option value="UT">Utah (UT)</option>
+                                    <option value="VT">Vermont (VT)</option>
+                                    <option value="VA">Virginia (VA)</option>
+                                    <option value="WA">Washington (WA)</option>
+                                    <option value="WV">West Virginia (WV)</option>
+                                    <option value="WI">Wisconsin (WI)</option>
+                                    <option value="WY">Wyoming (WY)</option>
+                                    <option value="DC">District of Columbia (DC)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="leadCEP">ZIP Code</label>
+                                <input type="text" id="leadCEP" placeholder="12345" maxlength="10" pattern="\d{5}(-\d{4})?">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OPORTUNIDADE DE VENDAS -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-chart-line"></i> Oportunidade de Vendas</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadNomeProposta">Nome da Proposta *</label>
+                                <input type="text" id="leadNomeProposta" required placeholder="Ex: Consultoria Financeira 2026">
+                            </div>
+                            <div class="form-group">
+                                <label for="leadValorEstimado">Valor Estimado (USD) *</label>
+                                <input type="number" id="leadValorEstimado" required step="0.01" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadEstagio">Estágio da Oportunidade *</label>
+                                <select id="leadEstagio" required>
+                                    <option value="Prospecção">Prospecção</option>
+                                    <option value="Qualificação">Qualificação</option>
+                                    <option value="Proposta">Proposta</option>
+                                    <option value="Negociação">Negociação</option>
+                                    <option value="Fechamento">Fechamento</option>
+                                    <option value="Ganho">Ganho</option>
+                                    <option value="Perdido">Perdido</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="leadProbabilidade">Probabilidade de Sucesso (%)</label>
+                                <input type="number" id="leadProbabilidade" min="0" max="100" value="50">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadDataFechamento">Data Prevista de Fechamento</label>
+                                <input type="date" id="leadDataFechamento">
+                            </div>
+                            <div class="form-group">
+                                <label for="leadResponsavel">Responsável pela Venda</label>
+                                <input type="text" id="leadResponsavel">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="leadDescricao">Descrição da Oportunidade</label>
+                            <textarea id="leadDescricao" rows="3" placeholder="Descreva a oportunidade, necessidades do cliente, etc..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- INFORMAÇÕES ADICIONAIS -->
+                    <div class="form-section">
+                        <h4><i class="fas fa-info-circle"></i> Informações Adicionais</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadFonte">Fonte/Origem</label>
+                                <select id="leadFonte">
+                                    <option value="Indicação">Indicação</option>
+                                    <option value="Publicidade">Publicidade</option>
+                                    <option value="Website">Website</option>
+                                    <option value="Redes Sociais">Redes Sociais</option>
+                                    <option value="Evento">Evento</option>
+                                    <option value="Cold Call">Cold Call</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="leadClassificacao">Classificação</label>
+                                <select id="leadClassificacao">
+                                    <option value="Prospect">Prospect</option>
+                                    <option value="Lead Quente">Lead Quente</option>
+                                    <option value="Cliente Ativo">Cliente Ativo</option>
+                                    <option value="Cliente Inativo">Cliente Inativo</option>
+                                    <option value="Cliente Premium">Cliente Premium</option>
+                                    <option value="Perdido">Perdido</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="leadDataNascimento">Data de Nascimento</label>
+                                <input type="date" id="leadDataNascimento">
+                            </div>
+                            <div class="form-group">
+                                <label for="leadWebsite">Website da Empresa</label>
+                                <input type="url" id="leadWebsite" placeholder="https://">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="leadRedesSociais">Redes Sociais (LinkedIn, Twitter, etc)</label>
+                            <input type="text" id="leadRedesSociais" placeholder="Ex: @empresa, linkedin.com/in/nome">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="window.fecharModalLead()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar Lead
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ordem de Serviço -->
+    <div id="modalOrdem" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-clipboard-list"></i> <span id="modalOrdemTitle">Nova Ordem de Serviço</span></h3>
+                <button class="btn-close" onclick="closeModal('modalOrdem')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formOrdem">
+                    <input type="hidden" id="ordemId">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="numeroOS">Nº da OS *</label>
+                            <input type="text" id="numeroOS" required readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dataOS">Data *</label>
+                            <input type="date" id="dataOS" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="codigoClienteOS">Cliente *</label>
+                            <select id="codigoClienteOS" required>
+                                <option value="">Selecione um cliente</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nomeClienteOS">Nome do Cliente</label>
+                            <input type="text" id="nomeClienteOS" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="tipoServico">Tipo de Serviço *</label>
+                            <select id="tipoServico" required>
+                                <option value="">Selecione um serviço</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="responsavelTecnico">Responsável Técnico *</label>
+                            <input type="text" id="responsavelTecnico" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="valorOS">Valor (US$) *</label>
+                            <input type="number" id="valorOS" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="statusOS">Status *</label>
+                            <select id="statusOS" required>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Em Andamento">Em Andamento</option>
+                                <option value="Concluída">Concluída</option>
+                                <option value="Cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observacaoOS">Observação</label>
+                        <textarea id="observacaoOS" rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('modalOrdem')">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnSalvarOrdem">
+                            <i class="fas fa-save"></i>
+                            Salvar OS
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Tipo de Serviço -->
+    <div id="modalServico" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-tools"></i> <span id="modalServicoTitle">Novo Serviço</span></h3>
+                <button class="btn-close" onclick="closeModal('modalServico')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formServico">
+                    <input type="hidden" id="servicoId">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="codigoServico">Código *</label>
+                            <input type="text" id="codigoServico" required readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="valorPadrao">Valor Padrão (US$)</label>
+                            <input type="number" id="valorPadrao" step="0.01" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nomeServico">Nome do Serviço *</label>
+                        <input type="text" id="nomeServico" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descricaoServico">Descrição</label>
+                        <textarea id="descricaoServico" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ativoServico">Status</label>
+                        <select id="ativoServico">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('modalServico')">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnSalvarServico">
+                            <i class="fas fa-save"></i>
+                            Salvar Serviço
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Usuário -->
+    <div id="modalUsuario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> <span id="modalUsuarioTitle">Novo Usuário</span></h3>
+                <button class="btn-close" onclick="document.getElementById('modalUsuario').classList.remove('active');console.log('Modal fechado');">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formUsuario">
+                    <input type="hidden" id="usuarioId">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="usuarioNome">Nome Completo *</label>
+                            <input type="text" id="usuarioNome" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usuarioEmail">Email *</label>
+                            <input type="email" id="usuarioEmail" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="usuarioSenhaInicial">Senha Inicial *</label>
+                            <input type="password" id="usuarioSenhaInicial" required minlength="6">
+                            <small style="color: #64748b;">Mínimo 6 caracteres. Usuário deverá trocar no primeiro acesso.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Permissões</label>
+                            <div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="usuarioIsAdmin" style="width: auto;">
+                                    <span>Administrador</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" id="usuarioAtivo" checked style="width: auto;">
+                                    <span>Ativo</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('modalUsuario').classList.remove('active');">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="(function(){console.log('💾 Botão Salvar clicado');if(typeof window.salvarUsuario==='function'){window.salvarUsuario();}else{console.error('salvarUsuario não encontrado');alert('Erro ao salvar');}})();">
+                            <i class="fas fa-save"></i>
+                            Salvar Usuário
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Resetar Senha -->
+    <div id="modalResetSenha" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> Resetar Senha</h3>
+                <button class="btn-close" onclick="fecharModalResetSenha()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1.5rem; color: #64748b;">
+                    Digite a nova senha temporária para o usuário:
+                </p>
+                <form id="formResetSenha">
+                    <input type="hidden" id="resetUsuarioId">
+                    
+                    <div class="form-group">
+                        <label for="resetNovaSenha">Nova Senha Temporária *</label>
+                        <input type="password" id="resetNovaSenha" required minlength="6">
+                        <small style="color: #64748b;">Usuário deverá trocar no próximo acesso.</small>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="fecharModalResetSenha()">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-key"></i>
+                            Resetar Senha
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Scripts -->
+    <script src="js/user-manager.js?v=3.1.8"></script>
+    <script src="js/data-preservation.js?v=3.1.5"></script>
+    <script src="js/data-recovery.js?v=3.1.7"></script>
+    <script src="js/emergency-recovery.js?v=3.1.6"></script>
+    <script src="js/logo-fix.js?v=3.1.2"></script>
+    <script src="js/us-formatting.js?v=3.1.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js?v=3.1.7"></script>
+    <script src="js/admin-usuarios.js?v=3.1.8"></script>
+    <script src="js/crm.js?v=3.1.6"></script>
+    <script src="integracao-auth.js?v=3.1.8"></script>
+    
+    <!-- Script de Configuração Forçada dos Botões Admin -->
+    <script>
+    console.log('🔧 Script inline de admin carregado');
+    
+    // Aguardar scripts externos carregarem
+    setTimeout(function() {
+        console.log('⏰ Configurando botões de administração...');
+        
+        // Configurar botão Novo Usuário
+        const btnNovoUsuario = document.getElementById('btnNovoUsuario');
+        if (btnNovoUsuario && typeof window.abrirModalUsuario === 'function') {
+            // Remover listeners antigos
+            const newBtn = btnNovoUsuario.cloneNode(true);
+            btnNovoUsuario.parentNode.replaceChild(newBtn, btnNovoUsuario);
+            
+            // Adicionar novo listener
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🖱️ Botão Novo Usuário clicado');
+                window.abrirModalUsuario();
+            });
+            
+            console.log('✅ Botão Novo Usuário configurado');
+        } else {
+            console.warn('⚠️ btnNovoUsuario ou abrirModalUsuario não encontrado');
+            console.log('   btnNovoUsuario:', btnNovoUsuario);
+            console.log('   abrirModalUsuario:', typeof window.abrirModalUsuario);
+        }
+        
+        // Configurar busca de usuários
+        const searchUsuarios = document.getElementById('searchUsuarios');
+        if (searchUsuarios && typeof window.carregarUsuarios === 'function') {
+            searchUsuarios.addEventListener('input', function(e) {
+                console.log('🔍 Busca:', e.target.value);
+                window.carregarUsuarios(e.target.value);
+            });
+            console.log('✅ Busca de usuários configurada');
+        }
+        
+        // NOVO: Verificar se a seção Administração já está visível
+        console.log('🔍 Verificando se seção Administração está visível...');
+        const secaoAdmin = document.getElementById('administracao');
+        if (secaoAdmin) {
+            const isVisible = secaoAdmin.classList.contains('active') || 
+                            secaoAdmin.style.display === 'block' ||
+                            window.getComputedStyle(secaoAdmin).display === 'block';
+            
+            console.log('   Seção admin existe:', true);
+            console.log('   Seção admin visível:', isVisible);
+            
+            if (isVisible && typeof window.inicializarAdmin === 'function') {
+                console.log('✅ Seção Administração já está visível - inicializando...');
+                setTimeout(() => window.inicializarAdmin(), 300);
+            }
+        }
+        
+    }, 500);
+    </script>
+</body>
+</html>

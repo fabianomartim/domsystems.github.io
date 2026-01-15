@@ -1,0 +1,173 @@
+# ==================== SISTEMA OPERACIONAL ====================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+
+# ==================== EDITORES E IDEs ====================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains (WebStorm, PhpStorm, etc.)
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Atom
+.atom/
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ==================== NODE.JS ====================
+
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ==================== LOGS ====================
+
+# Logs gerais
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ==================== ARQUIVOS TEMPORÁRIOS ====================
+
+# Temporários
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+
+# Backups
+*.bak
+*.backup
+*~
+
+# ==================== BUILD E DIST ====================
+
+# Build
+build/
+dist/
+out/
+
+# ==================== TESTES ====================
+
+# Cobertura de testes
+coverage/
+.nyc_output/
+*.lcov
+
+# ==================== AMBIENTE ====================
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ==================== DOCUMENTAÇÃO INTERNA ====================
+
+# Documentos de desenvolvimento (não públicos)
+docs/internal/
+docs/private/
+notas-desenvolvimento.md
+TODO-PRIVATE.md
+
+# ==================== ARQUIVOS DE DIAGNÓSTICO ====================
+
+# Scripts de diagnóstico temporários
+DIAGNOSTICO-*.js
+CORRECAO-IMEDIATA-*.js
+teste-*.html
+
+# ==================== DADOS SENSÍVEIS ====================
+
+# Dados de teste sensíveis
+data/test/
+data/private/
+*.secret
+credentials.json
+
+# ==================== OUTROS ====================
+
+# Arquivos compactados
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Arquivos grandes (imagens de alta resolução, vídeos)
+*.psd
+*.ai
+*.sketch
+*.fig
+
+# Cache do navegador
+.cache/
+
+# ==================== PERMITIR ARQUIVOS ESPECÍFICOS ====================
+
+# Forçar inclusão de arquivos específicos mesmo que o padrão seja ignorado
+!.gitkeep
+!README.md
+!LICENSE
+
+# ==================== PROJETO ESPECÍFICO ====================
+
+# Backups do sistema (já salvos no localStorage)
+backup_*.json
+
+# Documentação de desenvolvimento que não deve ser pública
+DIAGNOSTICO-DADOS.md
+RESPOSTA-RECUPERACAO-DADOS.md
+CORRECAO-*.md
+SOLUCAO-*.md
+RESUMO-*.md
+RELATORIO-*.md
+
+# Arquivos de teste
+test-*.html
+teste-*.html
+*-test.js
+*-teste.js
+
+# Arquivos de log do sistema
+sistema-*.log
+debug-*.log
